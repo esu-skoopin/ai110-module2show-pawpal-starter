@@ -1,0 +1,52 @@
+classDiagram
+    class Owner {
+        +int ID
+        +string firstName
+        +string lastName
+        +createOwner()
+        +getOwner()
+        +editOwner()
+    }
+
+    class Pet {
+        +int ID
+        +string name
+        +string animalType
+        +string breed
+        +int ownerID
+        +createPet()
+        +getPetsByOwner()
+        +getPet()
+        +editPet()
+    }
+
+    class Task {
+        +int ID
+        +int petID
+        +string name
+        +string note
+        +int duration
+        +string priority
+        +string frequency
+        +date scheduledDate
+        +time scheduledTime
+        +bool completed
+        +createTask()
+        +getTask()
+        +getTasksByOwnerByDate()
+        +getTasksByOwnerByDateRange()
+        +editTask()
+    }
+
+    class OwnerAvailability {
+        +int ID
+        +int ownerID
+        +int dayOfWeek
+        +time startTime
+        +time endTime
+        +getOwnerAvailabilityByDayOfWeek()
+    }
+
+    Owner "1" --> "1..*" Pet : owns
+    Owner "1" --> "1..*" OwnerAvailability : has
+    Pet "1" --> "1..*" Task : has
