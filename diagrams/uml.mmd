@@ -31,6 +31,7 @@ classDiagram
         +string priority
         +string frequency
         +date scheduledDate
+		+time preferredTime
         +time scheduledTime
         +bool completed
         +createTask(petID, name, note, duration, priority, frequency, scheduledDate)
@@ -41,7 +42,7 @@ classDiagram
 		+deleteTask(id)
     }
 
-    class OwnerAvailability {
+    class Availability {
         +int ID
         +int ownerID
         +int dayOfWeek
