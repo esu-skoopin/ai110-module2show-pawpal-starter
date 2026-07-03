@@ -2,15 +2,34 @@
 
 ## 1. System Design
 
-**a. Initial design**
+**a. Three core actions**
+- Identify three core actions a user should be able to perform
+	Users should be able to add/edit their own info
+	Users should be able to add/edit the info for their pet(s) (e.g., name, type of animal, breed, etc.)
+	Users should be able to add/edit the types of pet care tasks needed for their pet. User must enter the name (e.g., walk), duration and priority for each task at minimum.
+
+**b. Initial design**
 
 - Briefly describe your initial UML design.
+
+	My initial UML design includes four classes: Owner, Pet, Task and OwnerAvailability. An owner can have multiple pets and availability records and each pet can have multiple tasks.
+
 - What classes did you include, and what responsibilities did you assign to each?
 
-**b. Design changes**
+	- Owner: create owner, get owner, edit owner and delete owner
+	- Pet: create pet, get pets by owner, get pet, edit pet and delete pet
+	- Task: create task, get task, get tasks by owner by date, get tasks by owner by date range, edit task and delete task
+	- OwnerAvailability: create availability, get all availabilities by owner, get all availabilities by owner by day of week, get availability, edit availability and delete availability
+
+**c. Design changes**
 
 - Did your design change during implementation?
+
+	No, the AI tool I'm using (Claude Code) did not find anything that needed to be changed.
+
 - If yes, describe at least one change and why you made it.
+
+	N/A.
 
 ---
 
