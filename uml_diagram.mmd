@@ -6,6 +6,7 @@ classDiagram
         +createOwner()
         +getOwner()
         +editOwner()
+		+deleteOwner()
     }
 
     class Pet {
@@ -18,6 +19,7 @@ classDiagram
         +getPetsByOwner()
         +getPet()
         +editPet()
+		+deletePet()
     }
 
     class Task {
@@ -36,6 +38,7 @@ classDiagram
         +getTasksByOwnerByDate()
         +getTasksByOwnerByDateRange()
         +editTask()
+		+deleteTask()
     }
 
     class OwnerAvailability {
@@ -44,7 +47,12 @@ classDiagram
         +int dayOfWeek
         +time startTime
         +time endTime
-        +getOwnerAvailabilityByDayOfWeek()
+		+createAvailability()
+        +getAvailabilitiesByOwner()
+		+getAvailabilitiesByOwnerByDayOfWeek()
+		+getAvailability()
+		+editAvailability()
+		+deleteAvailability()
     }
 
     Owner "1" --> "1..*" Pet : owns
