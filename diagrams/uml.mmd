@@ -3,10 +3,10 @@ classDiagram
         +int ID
         +string firstName
         +string lastName
-        +createOwner()
-        +getOwner()
-        +editOwner()
-		+deleteOwner()
+        +createOwner(firstName, lastName)
+        +getOwner(id)
+        +editOwner(id, firstName, lastName)
+		+deleteOwner(id)
     }
 
     class Pet {
@@ -15,11 +15,11 @@ classDiagram
         +string animalType
         +string breed
         +int ownerID
-        +createPet()
-        +getPetsByOwner()
-        +getPet()
-        +editPet()
-		+deletePet()
+        +createPet(ownerID, name, animalType, breed)
+        +getPetsByOwner(ownerID)
+        +getPet(id)
+        +editPet(id, name, animalType, breed)
+		+deletePet(id)
     }
 
     class Task {
@@ -33,12 +33,12 @@ classDiagram
         +date scheduledDate
         +time scheduledTime
         +bool completed
-        +createTask()
-        +getTask()
-        +getTasksByOwnerByDate()
-        +getTasksByOwnerByDateRange()
-        +editTask()
-		+deleteTask()
+        +createTask(petID, name, note, duration, priority, frequency, scheduledDate)
+        +getTask(id)
+        +getTasksByOwnerByDate(ownerID, date)
+        +getTasksByOwnerByDateRange(ownerID, startDate, endDate)
+        +editTask(id, name, note, duration, priority, frequency, scheduledDate, completed)
+		+deleteTask(id)
     }
 
     class OwnerAvailability {
@@ -47,14 +47,20 @@ classDiagram
         +int dayOfWeek
         +time startTime
         +time endTime
-		+createAvailability()
-        +getAvailabilitiesByOwner()
-		+getAvailabilitiesByOwnerByDayOfWeek()
-		+getAvailability()
-		+editAvailability()
-		+deleteAvailability()
+		+createAvailability(ownerID, dayOfWeek, startTime, endTime)
+        +getAvailabilitiesByOwner(ownerID)
+		+getAvailabilitiesByOwnerByDayOfWeek(ownerID, dayOfWeek)
+		+getAvailability(id)
+		+editAvailability(id, dayOfWeek, startTime, endTime)
+		+deleteAvailability(id)
     }
+
+	class Scheduler {
+		+generateSchedule(ownerID, date)
+	}
 
     Owner "1" --> "1..*" Pet : owns
     Owner "1" --> "1..*" OwnerAvailability : has
     Pet "1" --> "1..*" Task : has
+	Scheduler --> Task : schedules
+	Scheduler --> OwnerAvailability : uses
