@@ -11,7 +11,7 @@ class Task:
     name: str
     duration: int
     priority: str
-    frequency: str
+    recurrence: str
     scheduled_date: date
     scheduled_time: Optional[time] = None
     preferred_time: Optional[time] = None

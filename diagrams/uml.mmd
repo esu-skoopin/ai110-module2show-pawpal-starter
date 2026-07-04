@@ -29,16 +29,16 @@ classDiagram
         +string note
         +int duration
         +string priority
-        +string frequency
+        +string recurrence
         +date scheduledDate
 		+time preferredTime
         +time scheduledTime
         +bool completed
-        +createTask(petID, name, note, duration, priority, frequency, scheduledDate)
+        +createTask(petID, name, note, duration, priority, recurrence, scheduledDate)
         +getTask(id)
         +getTasksByOwnerByDate(ownerID, date)
         +getTasksByOwnerByDateRange(ownerID, startDate, endDate)
-        +editTask(id, name, note, duration, priority, frequency, scheduledDate, completed)
+        +editTask(id, name, note, duration, priority, recurrence, scheduledDate, completed)
 		+deleteTask(id)
     }
 

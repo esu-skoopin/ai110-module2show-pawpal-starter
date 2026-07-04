@@ -24,7 +24,7 @@ class TaskRepository:
         st.session_state["next_task_id"] = value
 
     def create(self, pet_id: int, name: str, note: Optional[str], duration: int,
-               priority: str, frequency: str, scheduled_date: date,
+               priority: str, recurrence: str, scheduled_date: date,
                preferred_time: Optional[time] = None) -> Task:
         task = Task(
             id=self._next_id,
@@ -33,7 +33,7 @@ class TaskRepository:
             note=note,
             duration=duration,
             priority=priority,
-            frequency=frequency,
+            recurrence=recurrence,
             scheduled_date=scheduled_date,
             preferred_time=preferred_time
         )
@@ -58,7 +58,7 @@ class TaskRepository:
                 and start_date <= t.scheduled_date <= end_date]
 
     def update(self, task_id: int, name: str, note: Optional[str], duration: int,
-               priority: str, frequency: str, scheduled_date: date,
+               priority: str, recurrence: str, scheduled_date: date,
                completed: bool, preferred_time: Optional[time] = None) -> Optional[Task]:
         task = self.get(task_id)
         if task is None:
@@ -67,7 +67,7 @@ class TaskRepository:
         task.note = note
         task.duration = duration
         task.priority = priority
-        task.frequency = frequency
+        task.recurrence = recurrence
         task.scheduled_date = scheduled_date
         task.completed = completed
         task.preferred_time = preferred_time

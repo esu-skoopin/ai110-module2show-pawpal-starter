@@ -39,7 +39,7 @@ class TestTaskRepository(unittest.TestCase):
         task = self.task_repo.create(
             pet_id=self.pet.id, name="Feed breakfast",
             note=None, duration=10,
-            priority="essential", frequency="daily",
+            priority="Essential", recurrence="Daily",
             scheduled_date=self.today,
         )
         self.assertFalse(task.completed)
@@ -54,7 +54,7 @@ class TestTaskRepository(unittest.TestCase):
         self.task_repo.create(
             pet_id=self.pet.id, name="Morning walk",
             note=None, duration=30,
-            priority="essential", frequency="daily",
+            priority="Essential", recurrence="Daily",
             scheduled_date=self.today,
         )
 
