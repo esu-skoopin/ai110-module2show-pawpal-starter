@@ -13,6 +13,7 @@ PRIORITY_ORDER = {"essential": 0, "preferred": 1, "low": 2}
 
 class Scheduler:
     def __init__(self, task_repo: TaskRepository, availability_repo: AvailabilityRepository):
+        """Store the task and availability repositories used by the scheduler."""
         self.task_repo = task_repo
         self.availability_repo = availability_repo
 
@@ -132,10 +133,12 @@ class Scheduler:
 
     def _slot_is_free(self, start: int, end: int,
                       occupied: list[tuple[int, int]]) -> bool:
+        """Return True if the interval [start, end) does not overlap any occupied interval."""
         return not any(s < end and start < e for s, e in occupied)
 
     def _find_earliest_slot(self, win_start: int, win_end: int, duration: int,
                             occupied: list[tuple[int, int]]) -> Optional[int]:
+        """Return the earliest free start minute in the window that fits duration, or None."""
         # Candidates are the window start and the end of every occupied interval.
         candidates = sorted({win_start} | {e for _, e in occupied})
         for candidate in candidates:
@@ -147,6 +150,7 @@ class Scheduler:
 
     def _build_reason(self, task: Task, window: Availability,
                       start: time, preferred_honored: bool = False) -> str:
+        """Build a human-readable explanation of why and when a task was scheduled."""
         window_label = self._format_window(window)
         parts = [f"Scheduled at {start.strftime('%H:%M')} within the {window_label} window."]
         if task.preferred_time is not None:
@@ -166,6 +170,7 @@ class Scheduler:
         return " ".join(parts)
 
     def _format_window(self, window: Availability) -> str:
+        """Format an availability window as a 'HH:MM–HH:MM' string."""
         if window.start_time is None or window.end_time is None:
             return "unknown window"
         return (
@@ -174,7 +179,9 @@ class Scheduler:
         )
 
     def _time_to_minutes(self, t: time) -> int:
+        """Convert a time object to minutes since midnight."""
         return t.hour * 60 + t.minute
 
     def _minutes_to_time(self, minutes: int) -> time:
+        """Convert minutes since midnight to a time object."""
         return time(minutes // 60, minutes % 60)
