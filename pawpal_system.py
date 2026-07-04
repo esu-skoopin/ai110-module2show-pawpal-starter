@@ -8,7 +8,7 @@ from repositories.task_repository import TaskRepository
 from repositories.availability_repository import AvailabilityRepository
 
 
-PRIORITY_ORDER = {"essential": 0, "preferred": 1, "low": 2}
+PRIORITY_ORDER = {"Essential": 0, "Preferred": 1, "Low": 2}
 
 
 class Scheduler:
@@ -128,6 +128,30 @@ class Scheduler:
                 })
 
         return results
+
+    def sort_by_scheduled_time(self, results: list[dict]) -> list[dict]:
+        """Return results sorted earliest scheduled_time first; unscheduled tasks go last."""
+        scheduled = [r for r in results if r["scheduled"]]
+        unscheduled = [r for r in results if not r["scheduled"]]
+        scheduled.sort(key=lambda r: r["scheduled_time"])
+        return scheduled + unscheduled
+
+    def filter_tasks(self, results: list[dict],
+                     completed: Optional[bool] = None,
+                     pet_id: Optional[int] = None) -> list[dict]:
+        """Return results matching the given filters; omitting a filter leaves it unconstrained.
+
+        Args:
+            completed: True for completed tasks only, False for incomplete only,
+                       None to include both.
+            pet_id:    Only include tasks belonging to this pet; None includes all pets.
+        """
+        filtered = results
+        if completed is not None:
+            filtered = [r for r in filtered if r["task"].completed == completed]
+        if pet_id is not None:
+            filtered = [r for r in filtered if r["task"].pet_id == pet_id]
+        return filtered
 
     # ------------------------------------------------------------------ helpers
 
