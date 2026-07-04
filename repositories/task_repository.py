@@ -27,11 +27,16 @@ class TaskRepository:
                priority: str, frequency: str, scheduled_date: date,
                preferred_time: Optional[time] = None) -> Task:
         task = Task(
-            pet_id=pet_id, name=name, note=note, duration=duration,
-            priority=priority, frequency=frequency, scheduled_date=scheduled_date,
-            preferred_time=preferred_time,
+            id=self._next_id,
+            pet_id=pet_id,
+            name=name,
+            note=note,
+            duration=duration,
+            priority=priority,
+            frequency=frequency,
+            scheduled_date=scheduled_date,
+            preferred_time=preferred_time
         )
-        task.id = self._next_id
         self._next_id += 1
         self._store[task.id] = task
         return task
@@ -66,6 +71,13 @@ class TaskRepository:
         task.scheduled_date = scheduled_date
         task.completed = completed
         task.preferred_time = preferred_time
+        return task
+    
+    def mark_complete(self, task_id: int) -> Optional[Task]:
+        task = self.get(task_id)
+        if task is None:
+            return None
+        task.completed = True
         return task
 
     def delete(self, task_id: int) -> bool:

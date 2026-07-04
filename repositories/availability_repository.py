@@ -24,9 +24,13 @@ class AvailabilityRepository:
 
     def create(self, owner_id: int, day_of_week: int,
                start_time: time, end_time: time) -> Availability:
-        avail = Availability(owner_id=owner_id, day_of_week=day_of_week,
-                             start_time=start_time, end_time=end_time)
-        avail.id = self._next_id
+        avail = Availability(
+            id=self._next_id,
+            owner_id=owner_id,
+            day_of_week=day_of_week,
+            start_time=start_time,
+            end_time=end_time
+        )
         self._next_id += 1
         self._store[avail.id] = avail
         return avail

@@ -23,8 +23,13 @@ class PetRepository:
 
     def create(self, owner_id: int, name: str,
                animal_type: Optional[str] = None, breed: Optional[str] = None) -> Pet:
-        pet = Pet(name=name, owner_id=owner_id, animal_type=animal_type, breed=breed)
-        pet.id = self._next_id
+        pet = Pet(
+            id=self._next_id,
+            name=name,
+            owner_id=owner_id,
+            animal_type=animal_type,
+            breed=breed
+        )
         self._next_id += 1
         self._store[pet.id] = pet
         return pet

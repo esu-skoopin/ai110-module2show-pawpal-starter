@@ -6,7 +6,7 @@ from typing import Optional
 
 @dataclass
 class Task:
-    id: Optional[int] = field(default=None, init=False)
+    id: int
     pet_id: int
     name: str
     duration: int

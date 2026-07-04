@@ -5,6 +5,6 @@ from typing import Optional
 
 @dataclass
 class Owner:
-	id: Optional[int] = field(default=None, init=False)
-	first_name: str
-	last_name: str
+    id: int
+    first_name: str
+    last_name: str

@@ -5,7 +5,7 @@ from typing import Optional
 
 @dataclass
 class Pet:
-    id: Optional[int] = field(default=None, init=False)
+    id: int
     name: str
     owner_id: int
     animal_type: Optional[str] = None

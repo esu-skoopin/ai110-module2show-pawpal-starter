@@ -6,7 +6,7 @@ from typing import Optional
 
 @dataclass
 class Availability:
-    id: Optional[int] = field(default=None, init=False)
+    id: int
     owner_id: int
     day_of_week: int
     start_time: time
