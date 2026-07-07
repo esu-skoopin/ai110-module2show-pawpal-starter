@@ -77,14 +77,11 @@ Sample test output:
 
 ## 📐 Smarter Scheduling
 
-> Fill in once you've implemented scheduling logic.
-
 | Feature | Method(s) | Notes |
 |---------|-----------|-------|
-| Task sorting | | e.g., by priority, duration |
-| Filtering | | e.g., skip tasks if time runs out |
-| Conflict handling | | e.g., overlapping time slots |
-| Recurring tasks | | e.g., daily vs. weekly |
+| Task sorting | `sort_by_scheduled_time()` | Sort tasks by scheduled time |
+| Filtering | `filter_tasks()` | Filter tasks by completion status and/or pet |
+| Recurring tasks | `mark_complete()` | Able to handle tasks that repeat daily, weekly, monthly and yearly |
 
 ## 📸 Demo Walkthrough
 

@@ -43,7 +43,12 @@
 **b. Tradeoffs**
 
 - Describe one tradeoff your scheduler makes.
+    
+    The primary algorithm my scheduler uses is a greedy one, meaning that once the scheduler sets the time for a task, it never revisits that decision. This means it can leave gaps that a smarter arrangement would have filled.
+
 - Why is that tradeoff reasonable for this scenario?
+
+    This tradeoff is reasonable for this scenario because going for a more optimal solution would require utilizing dynamic programming which doesn't scale well and has the potential to run a lot slower than the algorithm currently in place.
 
 ---
 

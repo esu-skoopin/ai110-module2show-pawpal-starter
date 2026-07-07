@@ -1,5 +1,6 @@
 from __future__ import annotations
-from datetime import date, time
+from datetime import date, time, timedelta
+from dateutil.relativedelta import relativedelta
 from typing import Optional
 import streamlit as st
 from models.task import Task
@@ -74,11 +75,39 @@ class TaskRepository:
         return task
     
     def mark_complete(self, task_id: int) -> Optional[Task]:
+        """Mark the task as completed and schedule the next occurrence if it recurs."""
         task = self.get(task_id)
         if task is None:
             return None
         task.completed = True
+        next_date = self._next_occurrence(task)
+        if next_date is not None:
+            self.create(
+                pet_id=task.pet_id,
+                name=task.name,
+                note=task.note,
+                duration=task.duration,
+                priority=task.priority,
+                recurrence=task.recurrence,
+                scheduled_date=next_date,
+                preferred_time=task.preferred_time,
+            )
         return task
+
+    _RECURRENCE_DELTAS: dict[str, timedelta | relativedelta] = {
+        "Daily":   timedelta(days=1),
+        "Weekly":  timedelta(weeks=1),
+        "Monthly": relativedelta(months=1),
+        "Yearly":  relativedelta(years=1),
+    }
+
+    def _next_occurrence(self, task: Task) -> Optional[date]:
+        """Return the next scheduled_date for a recurring task, or None if non-recurring."""
+        delta = self._RECURRENCE_DELTAS.get(task.recurrence)
+        if delta is None or task.scheduled_date is None:
+            return None
+        next_dt = task.scheduled_date + delta
+        return next_dt if isinstance(next_dt, date) else next_dt.date()
 
     def delete(self, task_id: int) -> bool:
         return self._store.pop(task_id, None) is not None
