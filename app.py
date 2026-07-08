@@ -7,6 +7,8 @@ from repositories.task_repository import TaskRepository
 from repositories.availability_repository import AvailabilityRepository
 from pawpal_system import Scheduler
 
+st.set_page_config(page_title="PawPal+", page_icon="🐾", layout="centered")
+
 # Repos are stateless session_state wrappers; safe to re-instantiate on every run.
 owner_repo = OwnerRepository()
 pet_repo = PetRepository()
@@ -17,7 +19,10 @@ DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sun
 PRIORITIES = ["Essential", "Preferred", "Low"]
 FREQUENCIES = ["Never", "Daily", "Weekly", "Monthly", "Yearly"]
 
-st.set_page_config(page_title="PawPal+", page_icon="🐾", layout="centered")
+# Load global CSS
+with open("ui/styles.css") as f:
+    st.html(f"<style>{f.read()}</style>")
+
 st.title("🐾 PawPal+")
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -28,7 +33,7 @@ st.header("Owner")
 owners = owner_repo.get_all()
 
 if not owners:
-    with st.form("create_owner"):
+    with st.form(key="create_owner", enter_to_submit=False):
         st.write("Create an owner to get started.")
         c1, c2 = st.columns(2)
         first = c1.text_input("First name")
@@ -68,7 +73,7 @@ else:
     st.info("No pets yet. Add one below.")
 
 with st.expander("Add a pet"):
-    with st.form("add_pet"):
+    with st.form(key="add_pet", enter_to_submit=False):
         c1, c2, c3 = st.columns(3)
         p_name = c1.text_input("Name")
         p_type = c2.text_input("Animal type (optional)")
@@ -102,7 +107,7 @@ else:
     st.info("No availability windows yet. Add one below.")
 
 with st.expander("Add an availability window"):
-    with st.form("add_availability"):
+    with st.form(key="add_availability", enter_to_submit=False):
         c1, c2, c3 = st.columns(3)
         a_day = c1.selectbox("Day", DAYS)
         a_start = c2.time_input("Start", value=time(8, 0))
@@ -123,27 +128,68 @@ st.header("Tasks")
 
 schedule_date = st.date_input("Date", value=date.today())
 
+# Scheduler is instantiated here so it can be shared with section 5.
+scheduler = Scheduler(task_repo=task_repo, availability_repo=avail_repo)
+
 if not pets:
     st.warning("Add a pet before adding tasks.")
 else:
     tasks = task_repo.get_by_owner_by_date(owner.id, schedule_date)
 
     if tasks:
-        for task in tasks:
-            pet = pet_repo.get(task.pet_id)
-            pet_name = pet.name if pet else "?"
-            icon = "✅" if task.completed else "⬜"
-            pref = (f" · preferred {task.preferred_time.strftime('%H:%M')}"
-                    if task.preferred_time else "")
-            st.write(f"{icon} **{task.name}** — {pet_name} | "
-                     f"{task.priority} | {task.duration} min{pref}")
-            if task.note:
-                st.caption(f"   {task.note}")
+        # ── Sort / filter controls ─────────────────────────────────────────
+        c_sort, c_status, c_pet = st.columns(3)
+        sort_by_time = c_sort.checkbox("Sort by time", key="tasks_sort")
+        status_filter = c_status.selectbox(
+            "Status", ["All", "Incomplete", "Completed"], key="tasks_status"
+        )
+        pet_options = ["All pets"] + [p.name for p in pets]
+        pet_filter_name = c_pet.selectbox("Pet", pet_options, key="tasks_pet")
+        pet_filter_id = next(
+            (p.id for p in pets if p.name == pet_filter_name), None
+        )
+
+        # Wrap raw Task objects into result dicts so the Scheduler methods can
+        # be applied — scheduled_time may be None if scheduling hasn't run yet.
+        task_results = [
+            {
+                "task": t,
+                "scheduled_time": t.scheduled_time,
+                "scheduled": t.scheduled_time is not None,
+                "reason": "",
+            }
+            for t in tasks
+        ]
+
+        completed_arg = (
+            None if status_filter == "All" else status_filter == "Completed"
+        )
+        task_results = scheduler.filter_tasks(
+            task_results, completed=completed_arg, pet_id=pet_filter_id
+        )
+        if sort_by_time:
+            task_results = scheduler.sort_by_scheduled_time(task_results)
+
+        # ── Task list ─────────────────────────────────────────────────────
+        if task_results:
+            for entry in task_results:
+                task = entry["task"]
+                pet = pet_repo.get(task.pet_id)
+                pet_name = pet.name if pet else "?"
+                icon = "✅" if task.completed else "⬜"
+                pref = (f" · preferred {task.preferred_time.strftime('%H:%M')}"
+                        if task.preferred_time else "")
+                st.write(f"{icon} **{task.name}** — {pet_name} | "
+                         f"{task.priority} | {task.duration} min{pref}")
+                if task.note:
+                    st.caption(f"   {task.note}")
+        else:
+            st.info("No tasks match the current filters.")
     else:
         st.info(f"No tasks for {schedule_date.strftime('%A, %B %-d')}.")
 
     with st.expander("Add a task"):
-        with st.form("add_task"):
+        with st.form(key="add_task", enter_to_submit=False):
             c1, c2 = st.columns(2)
             t_name = c1.text_input("Task name")
             t_pet = c2.selectbox("Pet", [p.name for p in pets])
@@ -184,7 +230,6 @@ st.divider()
 st.header("Generate Schedule")
 
 if st.button("Generate schedule", type="primary"):
-    scheduler = Scheduler(task_repo=task_repo, availability_repo=avail_repo)
     st.session_state["schedule_results"] = scheduler.generate_schedule(
         owner_id=owner.id, query_date=schedule_date
     )
@@ -194,13 +239,29 @@ if "schedule_results" in st.session_state:
     results = st.session_state["schedule_results"]
     result_date = st.session_state["schedule_for_date"]
 
-    scheduled = sorted(
-        [r for r in results if r["scheduled"]],
-        key=lambda r: r["scheduled_time"],
-    )
-    unscheduled = [r for r in results if not r["scheduled"]]
-
     st.subheader(f"{result_date.strftime('%A, %B %-d, %Y')}")
+
+    # ── Sort / filter controls ─────────────────────────────────────────────
+    c_sort, c_status, c_pet = st.columns(3)
+    sched_sort = c_sort.checkbox("Sort by time", key="sched_sort")
+    sched_status = c_status.selectbox(
+        "Status", ["All", "Incomplete", "Completed"], key="sched_status"
+    )
+    sched_pet_options = ["All pets"] + [p.name for p in pets]
+    sched_pet_name = c_pet.selectbox("Pet", sched_pet_options, key="sched_pet")
+    sched_pet_id = next(
+        (p.id for p in pets if p.name == sched_pet_name), None
+    )
+
+    completed_arg = (
+        None if sched_status == "All" else sched_status == "Completed"
+    )
+    view = scheduler.filter_tasks(results, completed=completed_arg, pet_id=sched_pet_id)
+    if sched_sort:
+        view = scheduler.sort_by_scheduled_time(view)
+
+    scheduled = [r for r in view if r["scheduled"]]
+    unscheduled = [r for r in view if not r["scheduled"]]
 
     if scheduled:
         st.table([
@@ -211,12 +272,15 @@ if "schedule_results" in st.session_state:
                         if pet_repo.get(r["task"].pet_id) else "?"),
                 "Priority": r["task"].priority.capitalize(),
                 "Duration": f"{r['task'].duration} min",
+                "Done": "✅" if r["task"].completed else "⬜",
             }
             for r in scheduled
         ])
         with st.expander("View explanations"):
             for r in scheduled:
                 st.write(f"**{r['task'].name}**: {r['reason']}")
+    elif not unscheduled:
+        st.info("No tasks match the current filters.")
     else:
         st.info("No tasks could be scheduled. Check that tasks exist for this date "
                 "and availability windows cover this day of the week.")
