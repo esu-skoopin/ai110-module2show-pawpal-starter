@@ -1,0 +1,87 @@
+classDiagram
+    class Owner {
+        +int id
+        +string firstName
+        +string lastName
+    }
+
+    class OwnerRepository {
+        +create(firstName, lastName) Owner
+        +get(id) Owner
+        +update(id, firstName, lastName) Owner
+        +delete(id) bool
+        +getAll() list
+    }
+
+    class Pet {
+        +int id
+        +int ownerID
+        +string name
+        +string animalType
+        +string breed
+    }
+
+    class PetRepository {
+        +create(ownerID, name, animalType, breed) Pet
+        +get(id) Pet
+        +getByOwner(ownerID) list
+        +update(id, name, animalType, breed) Pet
+        +delete(id) bool
+    }
+
+    class Task {
+        +int id
+        +int petID
+        +string name
+        +string note
+        +int duration
+        +string priority
+        +string recurrence
+        +date scheduledDate
+        +time preferredTime
+        +time scheduledTime
+        +bool completed
+    }
+
+    class TaskRepository {
+        +create(petID, name, note, duration, priority, recurrence, scheduledDate) Task
+        +get(id) Task
+        +getByOwnerByDate(ownerID, date) list
+        +getByOwnerByDateRange(ownerID, startDate, endDate) list
+        +update(id, name, note, duration, priority, recurrence, scheduledDate, completed) Task
+        +markComplete(id) Task
+        +delete(id) bool
+    }
+
+    class Availability {
+        +int id
+        +int ownerID
+        +int dayOfWeek
+        +time startTime
+        +time endTime
+    }
+
+    class AvailabilityRepository {
+        +create(ownerID, dayOfWeek, startTime, endTime) Availability
+        +get(id) Availability
+        +getByOwner(ownerID) list
+        +getByOwnerByDayOfWeek(ownerID, dayOfWeek) list
+        +update(id, dayOfWeek, startTime, endTime) Availability
+        +delete(id) bool
+    }
+
+    class Scheduler {
+        +generateSchedule(ownerID, date) list
+        +sortByScheduledTime(results) list
+        +filterTasks(results, completed, petID) list
+    }
+
+    Owner "1" --> "1..*" Pet : owns
+    Owner "1" --> "1..*" Availability : has
+    Pet "1" --> "1..*" Task : has
+    OwnerRepository ..> Owner : manages
+    PetRepository ..> Pet : manages
+    TaskRepository ..> Task : manages
+    AvailabilityRepository ..> Availability : manages
+    Scheduler --> TaskRepository : uses
+    Scheduler --> AvailabilityRepository : uses
