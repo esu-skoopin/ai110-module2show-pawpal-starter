@@ -61,19 +61,35 @@ TIME     TASK               PET      PRIORITY
 
 ## 🧪 Testing PawPal+
 
+Command to run the full test suite:
 ```bash
-# Run the full test suite:
-pytest
-
-# Run with coverage:
-pytest --cov
+python3 -m pytest
 ```
+
+The tests in my project cover the following areas:
+- Basic tests
+    - Whether adding a task for a pet increases the task count for the same pet
+    - Whether calling `mark_complete()` for a task sets `task.completed` to `True`
+- Whether sorting tasks by scheduled time works as expected
+- Whether filtering tasks by completion status and/or pet works as expected
+- Whether `mark_complete()` creates the next instance of a task, as appropriate, depending on whether the task is recurring or not
 
 Sample test output:
 
 ```
-# Paste your pytest output here
+tests/test_pawpal.py .......                                [100%]
+
+======================= 13 passed in 0.12s =======================
 ```
+
+Confidence level: ⭐️⭐️⭐️⭐️⭐️
+<blockquote>
+<details>
+  <summary><i>&nbsp;What does "confidence level" refer to?</i></summary>
+  <p></p>
+  <p><i>This metric describes how confident the code author is about the reliability of the system, based on the results of the existing tests, out of 5 stars</i></p>
+</details>
+</blockquote>
 
 ## 📐 Smarter Scheduling
 
